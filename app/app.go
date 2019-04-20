@@ -12,27 +12,6 @@ import (
 )
 
 const (
-	codeOK = iota
-	codeAppInitErr
-	codeAppRunErr
-)
-
-func Main(args []string) int {
-	a, err := newApp(args, os.Stdout, os.Stderr)
-	if err != nil {
-		_, _ = fmt.Fprintf(os.Stderr, "ERROR: %s\n", err.Error())
-		return codeAppInitErr
-	}
-
-	if err := a.run(); err != nil {
-		_, _ = fmt.Fprintf(os.Stderr, "ERROR: %s\n", err.Error())
-		return codeAppRunErr
-	}
-
-	return codeOK
-}
-
-const (
 	minFrames     = 1
 	maxFrames     = 500
 	defaultFrames = 50
@@ -51,7 +30,7 @@ type App struct {
 	errStream io.Writer
 }
 
-func newApp(args []string, outStream, errStream io.Writer) (*App, error) {
+func New(args []string, outStream, errStream io.Writer) (*App, error) {
 	flags := flag.NewFlagSet("gogo", flag.ContinueOnError)
 	flags.SetOutput(errStream)
 	flags.Usage = func() {
@@ -102,7 +81,7 @@ func newApp(args []string, outStream, errStream io.Writer) (*App, error) {
 	}, nil
 }
 
-func (a *App) run() error {
+func (a *App) Run() error {
 	for t := 0; t < a.frames; t++ {
 		a.clear()
 

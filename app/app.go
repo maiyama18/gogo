@@ -26,6 +26,15 @@ func Main(args []string) int {
 	return a.run()
 }
 
+const (
+	minFrames     = 1
+	maxFrames     = 500
+	defaultFrames = 50
+	minFps        = 1
+	maxFps        = 60
+	defaultFps    = 10
+)
+
 type App struct {
 	content  string
 	reverse  bool
@@ -52,8 +61,8 @@ func newApp(args []string, outStream, errStream io.Writer) (*App, error) {
 	)
 	flags.StringVar(&file, "file", "", "filepath whose content will run. if not set, the content is got from standard input")
 	flags.BoolVar(&reverse, "reverse", false, "if set, the animation run from right to left")
-	flags.IntVar(&frames, "frames", 50, "number of frames of the animation (default: 50, min: 1, max: 200)")
-	flags.IntVar(&fps, "fps", 10, "fps of the animation (default: 10, min: 1, max: 60)")
+	flags.IntVar(&frames, "frames", 50, fmt.Sprintf("number of frames of the animation (default: %d, min: %d, max: %d)", defaultFrames, minFrames, maxFrames))
+	flags.IntVar(&fps, "fps", 10, fmt.Sprintf("fps of the animation (default: %d, min: %d, max: %d)", defaultFps, minFps, maxFps))
 	if err := flags.Parse(args[1:]); err != nil {
 		return nil, fmt.Errorf("failed to parse command line options: %s", strings.Join(args[1:], " "))
 	}
@@ -64,15 +73,15 @@ func newApp(args []string, outStream, errStream io.Writer) (*App, error) {
 	}
 
 	if frames < 1 {
-		return nil, fmt.Errorf("min value of frames is 1. got=%d", frames)
+		return nil, fmt.Errorf("min value of frames is %d. got=%d", minFrames, frames)
 	} else if frames > 200 {
-		return nil, fmt.Errorf("max value of frames is 200. got=%d", frames)
+		return nil, fmt.Errorf("max value of frames is %d. got=%d", maxFrames, frames)
 	}
 
 	if fps < 1 {
-		return nil, fmt.Errorf("min value of fps is 1. got=%d", fps)
+		return nil, fmt.Errorf("min value of fps is %d. got=%d", minFrames, fps)
 	} else if fps > 60 {
-		return nil, fmt.Errorf("max value of fps is 60. got=%d", fps)
+		return nil, fmt.Errorf("max value of fps is %d. got=%d", maxFrames, fps)
 	}
 	interval := time.Duration(1000/fps) * time.Millisecond
 

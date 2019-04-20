@@ -30,6 +30,56 @@ func TestNew(t *testing.T) {
 			expectedFrames:   defaultFrames,
 			expectedInterval: time.Duration(1000/defaultFps) * time.Millisecond,
 		},
+		{
+			name:      "success-full_options",
+			inputArgs: strings.Fields("gogo -file testdata/hello.txt -fps 20 -frames 100 -reverse"),
+
+			expectedContent:  "hello",
+			expectedReverse:  true,
+			expectedFrames:   100,
+			expectedInterval: time.Duration(1000/20) * time.Millisecond,
+		},
+		{
+			name:      "failure-undefined_option",
+			inputArgs: strings.Fields("gogo -undefined undefined"),
+
+			expectedErrMsg:       "failed to parse",
+			expectedErrStreamMsg: "gogo is a command line tool",
+		},
+		{
+			name:      "failure-file_not_exist",
+			inputArgs: strings.Fields("gogo -file nonexistent.txt"),
+
+			expectedErrMsg: "no such file or directory",
+		},
+		{
+			name:      "failure-fps_too_small",
+			inputArgs: strings.Fields("gogo -fps 0 -file testdata/hello.txt"),
+
+			expectedErrMsg:       "min value of fps",
+			expectedErrStreamMsg: "gogo is a command line tool",
+		},
+		{
+			name:      "failure-fps_too_large",
+			inputArgs: strings.Fields("gogo -fps 1000 -file testdata/hello.txt"),
+
+			expectedErrMsg:       "max value of fps",
+			expectedErrStreamMsg: "gogo is a command line tool",
+		},
+		{
+			name:      "failure-frames_too_small",
+			inputArgs: strings.Fields("gogo -frames 0 -file testdata/hello.txt"),
+
+			expectedErrMsg:       "min value of frames",
+			expectedErrStreamMsg: "gogo is a command line tool",
+		},
+		{
+			name:      "failure-frames_too_large",
+			inputArgs: strings.Fields("gogo -frames 1000 -file testdata/hello.txt"),
+
+			expectedErrMsg:       "max value of frames",
+			expectedErrStreamMsg: "gogo is a command line tool",
+		},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {

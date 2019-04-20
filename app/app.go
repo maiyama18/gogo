@@ -61,8 +61,10 @@ func New(args []string, outStream, errStream io.Writer) (*App, error) {
 	}
 
 	if fps < minFps {
+		flags.Usage()
 		return nil, fmt.Errorf("min value of fps is %d. got=%d", minFrames, fps)
 	} else if fps > minFps {
+		flags.Usage()
 		return nil, fmt.Errorf("max value of fps is %d. got=%d", maxFrames, fps)
 	}
 	interval := time.Duration(1000/fps) * time.Millisecond

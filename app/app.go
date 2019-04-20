@@ -13,17 +13,22 @@ import (
 
 const (
 	codeOK = iota
-	codeInitAppErr
+	codeAppInitErr
+	codeAppRunErr
 )
 
 func Main(args []string) int {
 	a, err := newApp(args, os.Stdout, os.Stderr)
 	if err != nil {
 		_, _ = fmt.Fprintf(os.Stderr, "ERROR: %s\n", err.Error())
-		return codeInitAppErr
+		return codeAppInitErr
 	}
 
-	return a.run()
+	if err := a.run(); err != nil {
+		return codeAppRunErr
+	}
+
+	return codeOK
 }
 
 const (
@@ -96,7 +101,7 @@ func newApp(args []string, outStream, errStream io.Writer) (*App, error) {
 	}, nil
 }
 
-func (a *App) run() int {
+func (a *App) run() error {
 	for t := 0; t < a.frames; t++ {
 		a.clear()
 
@@ -110,13 +115,16 @@ func (a *App) run() int {
 		rdr := strings.NewReader(a.content)
 		sc := bufio.NewScanner(rdr)
 		for sc.Scan() {
-			_, _ = fmt.Fprintln(a.outStream, spaces+sc.Text())
+			_, err := fmt.Fprintln(a.outStream, spaces+sc.Text())
+			if err != nil {
+				return err
+			}
 		}
 
 		time.Sleep(a.interval)
 	}
 
-	return codeOK
+	return nil
 }
 
 func (a *App) clear() {

@@ -25,6 +25,7 @@ func Main(args []string) int {
 	}
 
 	if err := a.run(); err != nil {
+		_, _ = fmt.Fprintf(os.Stderr, "ERROR: %s\n", err.Error())
 		return codeAppRunErr
 	}
 

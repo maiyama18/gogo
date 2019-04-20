@@ -46,29 +46,31 @@ func New(args []string, outStream, errStream io.Writer) (*App, error) {
 	)
 	flags.StringVar(&file, "file", "", "filepath whose content will run. if not set, the content is got from standard input")
 	flags.BoolVar(&reverse, "reverse", false, "if set, the animation run from right to left")
-	flags.IntVar(&frames, "frames", 50, fmt.Sprintf("number of frames of the animation (default: %d, min: %d, max: %d)", defaultFrames, minFrames, maxFrames))
-	flags.IntVar(&fps, "fps", 10, fmt.Sprintf("fps of the animation (default: %d, min: %d, max: %d)", defaultFps, minFps, maxFps))
+	flags.IntVar(&frames, "frames", defaultFrames, fmt.Sprintf("number of frames of the animation (min: %d, max: %d)", minFrames, maxFrames))
+	flags.IntVar(&fps, "fps", defaultFps, fmt.Sprintf("fps of the animation (min: %d, max: %d)", minFps, maxFps))
 	if err := flags.Parse(args[1:]); err != nil {
 		return nil, fmt.Errorf("failed to parse command line options: %s", strings.Join(args[1:], " "))
 	}
+
+	if frames < minFrames {
+		flags.Usage()
+		return nil, fmt.Errorf("min value of frames is %d. got=%d", minFrames, frames)
+	} else if frames > maxFrames {
+		flags.Usage()
+		return nil, fmt.Errorf("max value of frames is %d. got=%d", maxFrames, frames)
+	}
+
+	if fps < minFps {
+		return nil, fmt.Errorf("min value of fps is %d. got=%d", minFrames, fps)
+	} else if fps > minFps {
+		return nil, fmt.Errorf("max value of fps is %d. got=%d", maxFrames, fps)
+	}
+	interval := time.Duration(1000/fps) * time.Millisecond
 
 	content, err := getContent(file)
 	if err != nil {
 		return nil, err
 	}
-
-	if frames < 1 {
-		return nil, fmt.Errorf("min value of frames is %d. got=%d", minFrames, frames)
-	} else if frames > 200 {
-		return nil, fmt.Errorf("max value of frames is %d. got=%d", maxFrames, frames)
-	}
-
-	if fps < 1 {
-		return nil, fmt.Errorf("min value of fps is %d. got=%d", minFrames, fps)
-	} else if fps > 60 {
-		return nil, fmt.Errorf("max value of fps is %d. got=%d", maxFrames, fps)
-	}
-	interval := time.Duration(1000/fps) * time.Millisecond
 
 	return &App{
 		content:  content,

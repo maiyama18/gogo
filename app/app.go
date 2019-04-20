@@ -36,6 +36,7 @@ func New(args []string, outStream, errStream io.Writer) (*App, error) {
 	flags.Usage = func() {
 		_, _ = fmt.Fprintf(errStream, helpMessage)
 		flags.PrintDefaults()
+		_, _ = fmt.Fprintln(errStream, "")
 	}
 
 	var (

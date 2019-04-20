@@ -154,9 +154,14 @@ func getContent(file string) (string, error) {
 
 const helpMessage = `
 gogo is a command line tool to run some input in console.
+it can read input from file or stdin.
 
 EXAMPLE: 
-$ gogo -contest ABC051 -problem C -command 'python c.py'
+# input from file
+$ gogo -file input.txt -fps 30 -frames 100
+
+# input from stdin
+$ cat input.txt | gogo -fps 20 -reverse
 
 OPTION:
 `
